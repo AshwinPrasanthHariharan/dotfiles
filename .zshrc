@@ -42,6 +42,10 @@ alias code.="code ."
 mkcd() {
     mkdir -p "$1" && cd "$1"
 }
+mkagent() {
+    eval "$(ssh-agent -s)"
+   ssh-add ~/.ssh/id_ed25519
+}
 
 # ==============================================================================
 # PROMPT CONFIGURATION
