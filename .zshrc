@@ -26,13 +26,17 @@ alias cat="bat"
 alias ls="eza --icons --group-directories-first"
 alias ll="eza -lh --icons"
 alias la="eza -lha --icons"
-
+# tree for git cache only
+alias gtree="eza --tree --git-ignore --icons --sort=extension"
+alias tree="eza --tree --icons"
 # Clear screen aliases
 alias clr="clear"
 alias c="clear"
 
 # Quick open current directory in VS Code
 alias code.="code ."
+
+
 
 # ==============================================================================
 # FUNCTIONS
@@ -47,6 +51,31 @@ mkagent() {
    ssh-add ~/.ssh/id_ed25519
 }
 
+cmd2pdf() {
+  local TMP_HTML="/tmp/cmd2pdf.html"
+  local OUT="output.pdf"
+
+  eval "$*" | aha --black > "$TMP_HTML"
+
+  # Inject FULL font embedding
+  sed -i 's|<head>|<head><style>
+@font-face {
+  font-family: "JetBrainsMonoNF";
+  src: url("file:///usr/share/fonts/jetbrains-mono/JetBrainsMono-Regular.ttf");
+}
+body {
+  background: #1e1e2e;
+  color: #cdd6f4;
+  font-family: "JetBrainsMonoNF", monospace;
+  font-size: 14px;
+  padding: 20px;
+}
+</style>|' "$TMP_HTML"
+
+  wkhtmltopdf "$TMP_HTML" "$OUT" >/dev/null 2>&1
+
+  echo "📄 Saved to $OUT"
+}
 # ==============================================================================
 # PROMPT CONFIGURATION
 # ==============================================================================
@@ -172,3 +201,4 @@ ZSH_HIGHLIGHT_STYLES[globbing]='fg=cyan'
 ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=yellow'
 ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=yellow'
 ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=red,bold'
+source /home/Ashwin/HS202_repo/.HS202rc
