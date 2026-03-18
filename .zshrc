@@ -46,6 +46,24 @@ alias code.="code ."
 mkcd() {
     mkdir -p "$1" && cd "$1"
 }
+
+kural() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: kural <number>"
+    return 1
+  fi
+
+  if command -v pixi >/dev/null 2>&1; then
+    if pixi run python "$HOME/dotfiles/thirukkural/kural_cli.py" "$@"; then
+      return 0
+    fi
+
+    echo "pixi run failed, using system python3..."
+  fi
+
+  python3 "$HOME/dotfiles/thirukkural/kural_cli.py" "$@"
+}
+
 mkagent() {
     eval "$(ssh-agent -s)"
    ssh-add ~/.ssh/id_ed25519
