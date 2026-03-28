@@ -24,7 +24,9 @@ alias cat="bat"
 
 alias ff="fastfetch"
 
-alias ss="source ~/.zshrc"
+alias zu="SSH_CONNECTION=\"1 2 3 4\""
+alias zuc="unset SSH_CONNECTION "
+alias zz="source ~/.zshrc"
 # Improved ls commands using eza with icons and directory grouping
 alias ls="eza --colour=always --icons=always --group-directories-first"
 alias ll="eza -lh --colour=always --icons=always"
@@ -507,72 +509,7 @@ mkagent() {
    ssh-add ~/.ssh/id_ed25519
 }
 #------------PATHS----------------
-export PATH="$HOME/.pixi/bin:$PATH"
-
-eza_limited() {
-    local file_limit=10
-    local args=()
-
-    # parse custom flag
-    for arg in "$@"; do
-        case $arg in
-            --file-limit=*)
-                file_limit="${arg#*=}"
-                ;;
-            *)
-                args+=("$arg")
-                ;;
-        esac
-    done
-
-    eza_limited() {
-    local file_limit=10
-    local args=()
-
-    for arg in "$@"; do
-        case $arg in
-            --file-limit=*)
-                file_limit="${arg#*=}"
-                ;;
-            *)
-                args+=("$arg")
-                ;;
-        esac
-    done
-
-    eza --tree "${args[@]}" --color=always | awk -v limit="$file_limit" '
-    {
-        line = $0
-
-        # detect indentation level
-        indent = match(line, /[^ ]/) - 1
-        level = int(indent / 2)
-
-        # reset deeper levels when going up
-        for (i in counts) {
-            if (i > level) delete counts[i]
-        }
-
-        # detect directory (lines ending with / OR tree branches)
-        is_dir = (line ~ /\/$/)
-
-        if (is_dir) {
-            print line
-            counts[level+1] = 0   # reset file count for this directory
-        } else {
-            if (!(level in counts)) counts[level] = 0
-
-            if (counts[level] < limit) {
-                print line
-                counts[level]++
-            } else if (counts[level] == limit) {
-                print substr(line, 1, indent) "..."
-                counts[level]++
-            }
-        }
-    }'
-}
-
+export PATH="$HOME/.pixi/bin:$PATH" 
 #------------keep at end-------------
 source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
