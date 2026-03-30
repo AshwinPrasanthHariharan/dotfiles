@@ -199,6 +199,7 @@ ZSH_HIGHLIGHT_STYLES[alias]='fg=green'
 ZSH_HIGHLIGHT_STYLES[path]='fg=cyan'
 ZSH_HIGHLIGHT_STYLES[globbing]='fg=cyan'
 ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=yellow'
-ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=yellow'
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=orange'
 ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=red,bold'
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#0f0f0f"
 source /home/Ashwin/HS202_repo/.HS202rc
