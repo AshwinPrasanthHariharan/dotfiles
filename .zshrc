@@ -14,7 +14,8 @@ eval "$(zoxide init zsh)"
 
 # Add Cargo bin directory to PATH for Rust tools
 export PATH="$HOME/.cargo/bin:$PATH"
-
+# Add Term
+export TERM=xterm
 # ==============================================================================
 # ALIASES
 # ==============================================================================
