@@ -14,6 +14,7 @@ eval "$(zoxide init zsh)"
 
 # Add Cargo bin directory to PATH for Rust tools
 export PATH="$HOME/.cargo/bin:$PATH"
+printf '\e]4;4;#4444dc\a'
 
 # ==============================================================================
 # ALIASES
@@ -201,5 +202,5 @@ ZSH_HIGHLIGHT_STYLES[globbing]='fg=cyan'
 ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=yellow'
 ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=orange'
 ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=red,bold'
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#0f0f0f"
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#777777"
 source /home/Ashwin/HS202_repo/.HS202rc
