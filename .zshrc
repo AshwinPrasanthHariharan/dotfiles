@@ -4,7 +4,6 @@
 # ==============================================================================
 # INITIALIZATION
 # ==============================================================================
-
 # Initialize zoxide for intelligent directory navigation
 eval "$(zoxide init zsh)"
 
@@ -16,6 +15,7 @@ eval "$(zoxide init zsh)"
 export PATH="$HOME/.cargo/bin:$PATH"
 # Add Term
 export TERM=xterm
+export TERMINFO="$HOME/.pixi/envs/default/share/terminfo"
 # ==============================================================================
 # ALIASES
 # ==============================================================================
@@ -32,6 +32,7 @@ alias zz="source ~/.zshrc"
 alias ls="eza --colour=always --icons=always --group-directories-first"
 alias ll="eza -lh --colour=always --icons=always"
 alias la="eza -lha --colour=always --icons=always"
+alias lg="eza -la --git --git-repos --icons=always --colour=always"
 # tree for git cache only
 alias gtree="eza --tree --git-ignore --colour=always --icons=always --sort=extension"
 alias tree="eza --tree --colour=always --icons=always"
@@ -70,7 +71,13 @@ kural() {
   python3 "$HOME/dotfiles/thirukkural/kural_cli.py" "$@"
 }
 
+pxa() {
+    eval "$(pixi shell-hook)"
+}
 
+pxd() {
+    exec "$SHELL"
+}
 
 
 # ==============================================================================
@@ -523,4 +530,4 @@ ZSH_HIGHLIGHT_STYLES[globbing]='fg=cyan'
 ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=yellow'
 ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=yellow'
 ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=red,bold'
-source /home/Ashwin/HS202_repo/.HS202rc
+source ~/HS202_repo/.HS202rc
