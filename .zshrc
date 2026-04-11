@@ -519,8 +519,11 @@ mkagent() {
 #------------PATHS----------------
 export PATH="$HOME/.pixi/bin:$PATH" 
 #------------keep at end-------------
-source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# autosuggestions (can be anywhere before highlighting)
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# syntax highlighting MUST BE LAST
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 #-----------syntax colours----------
 ZSH_HIGHLIGHT_STYLES[command]='fg=green,bold'
 ZSH_HIGHLIGHT_STYLES[builtin]='fg=green'
