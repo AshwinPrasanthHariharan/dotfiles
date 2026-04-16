@@ -1,237 +1,120 @@
 #!/usr/bin/env python3
-"""CLI for fetching a Thirukkural by number.
-
-By default this tries to render in a PyQt window so Tamil text is displayed
-using GUI fonts instead of terminal fonts.
-"""
-
-from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        prog="kural",
-        description="Print a Thirukkural by number (1-1330).",
-    )
-    parser.add_argument("number", type=int, help="Kural number (1-1330)")
-    parser.add_argument(
-        "--text",
-        action="store_true",
-        help="Force terminal output instead of PyQt rendering.",
-    )
-    return parser.parse_args()
+def _load_json(path: Path) -> Any:
+	try:
+		with path.open("r", encoding="utf-8") as f:
+			return json.load(f)
+	except FileNotFoundError:
+		print(f"Error: data file not found: {path}", file=sys.stderr)
+		sys.exit(1)
+	except json.JSONDecodeError as exc:
+		print(f"Error: invalid JSON in {path}: {exc}", file=sys.stderr)
+		sys.exit(1)
 
 
-def load_kurals(json_path: Path) -> list[dict]:
-    try:
-        data = json.loads(json_path.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        print(f"Error: data file not found: {json_path}", file=sys.stderr)
-        sys.exit(1)
-    except json.JSONDecodeError as exc:
-        print(f"Error: invalid JSON in {json_path}: {exc}", file=sys.stderr)
-        sys.exit(1)
-
-    kurals = data.get("kural")
-    if not isinstance(kurals, list):
-        print("Error: unexpected JSON format in thirukkural.json", file=sys.stderr)
-        sys.exit(1)
-
-    return kurals
+def _find_kural(kural_items: List[Dict[str, Any]], number: int) -> Optional[Dict[str, Any]]:
+	for item in kural_items:
+		if item.get("Number") == number:
+			return item
+	return None
 
 
-def find_kural(kurals: list[dict], number: int) -> dict | None:
-    for item in kurals:
-        if item.get("Number") == number:
-            return item
-    return None
+def _find_kural_details(detail_data: List[Dict[str, Any]], number: int) -> Optional[Dict[str, Any]]:
+	for root in detail_data:
+		section = root.get("section", {})
+		for paal in section.get("detail", []):
+			chapter_group = paal.get("chapterGroup", {})
+			for iyal in chapter_group.get("detail", []):
+				for chapter in iyal.get("chapters", {}).get("detail", []):
+					start = chapter.get("start")
+					end = chapter.get("end")
+					if isinstance(start, int) and isinstance(end, int) and start <= number <= end:
+						return {
+							"book_tamil": root.get("tamil"),
+							"paal_name": paal.get("name"),
+							"paal_translation": paal.get("translation"),
+							"iyal_name": iyal.get("name"),
+							"iyal_translation": iyal.get("translation"),
+							"chapter_name": chapter.get("name"),
+							"chapter_translation": chapter.get("translation"),
+							"chapter_number": chapter.get("number"),
+							"range_start": start,
+							"range_end": end,
+						}
+	return None
 
 
-def format_kural(entry: dict) -> str:
-    lines: list[str] = [
-        f"Kural {entry.get('Number')}",
-        "",
-        entry.get("Line1", ""),
-        entry.get("Line2", ""),
-    ]
+def _print_kural(number: int, kural: Dict[str, Any], details: Optional[Dict[str, Any]]) -> None:
+	print(f"Kural {number}")
+	print("-" * 40)
+	print(kural.get("Line1", ""))
+	print(kural.get("Line2", ""))
+	print()
 
-    translation = entry.get("Translation")
-    if translation:
-        lines.extend(["", f"Translation: {translation}"])
+	if kural.get("Translation"):
+		print(f"Translation: {kural['Translation']}")
+	if kural.get("transliteration1") or kural.get("transliteration2"):
+		print("Transliteration:")
+		if kural.get("transliteration1"):
+			print(f"  {kural['transliteration1']}")
+		if kural.get("transliteration2"):
+			print(f"  {kural['transliteration2']}")
 
-    explanation = entry.get("explanation")
-    if explanation:
-        lines.append(f"Explanation: {explanation}")
-
-    return "\n".join(lines)
-
-
-def print_text(entry: dict) -> None:
-    print(format_kural(entry))
-
-
-def can_use_gui() -> bool:
-    # Linux uses DISPLAY/Wayland for GUI sessions. Skip GUI in headless shells.
-    return bool(os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY"))
-
-
-def render_with_pyqt(entry: dict) -> bool:
-    try:
-        from PyQt5.QtCore import Qt
-        from PyQt5.QtGui import QFont
-        from PyQt5.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
-        qt_major = 5
-    except Exception:
-        try:
-            from PyQt6.QtCore import Qt
-            from PyQt6.QtGui import QFont
-            from PyQt6.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
-            qt_major = 6
-        except Exception:
-            return False
-
-    class KuralWidget(QWidget):
-        def __init__(self, kural_entry: dict) -> None:
-            super().__init__()
-
-            def _qt_flag(name: str):
-                if hasattr(Qt, "WindowType"):
-                    return getattr(Qt.WindowType, name)
-                return getattr(Qt, name)
-
-            # Frameless floating card similar to the provided example.
-            self.setWindowFlags(
-                _qt_flag("FramelessWindowHint")
-                | _qt_flag("WindowStaysOnTopHint")
-                | _qt_flag("Tool")
-            )
-
-            if qt_major == 5:
-                self.setAttribute(Qt.WA_TranslucentBackground)
-            else:
-                self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-
-            layout = QVBoxLayout()
-            layout.setContentsMargins(18, 18, 18, 18)
-            layout.setSpacing(8)
-
-            title = QLabel(f"Kural {kural_entry.get('Number')}")
-            title.setFont(QFont("Inter", 10))
-            title.setStyleSheet("color: rgba(255,255,255,180);")
-
-            kural_text = QLabel(
-                f"{kural_entry.get('Line1', '')}\n{kural_entry.get('Line2', '')}"
-            )
-            tamil_font = QFont("Noto Sans Tamil", 20)
-            if tamil_font.family() == "":
-                tamil_font = QFont("Noto Serif Tamil", 20)
-            kural_text.setFont(tamil_font)
-            kural_text.setWordWrap(True)
-            kural_text.setStyleSheet("color: white; margin-top: 4px;")
-
-            translation_value = kural_entry.get("Translation", "")
-            translation = QLabel(translation_value)
-            translation.setFont(QFont("Inter", 11))
-            translation.setWordWrap(True)
-            translation.setStyleSheet(
-                "color: rgba(255,255,255,210); margin-top: 10px;"
-            )
-
-            explanation_value = kural_entry.get("explanation", "")
-            explanation = QLabel(explanation_value)
-            explanation.setFont(QFont("Inter", 10))
-            explanation.setWordWrap(True)
-            explanation.setStyleSheet("color: rgba(255,255,255,170); margin-top: 6px;")
-
-            layout.addWidget(title)
-            layout.addWidget(kural_text)
-            if translation_value:
-                layout.addWidget(translation)
-            if explanation_value:
-                layout.addWidget(explanation)
-
-            self.setLayout(layout)
-            self.setStyleSheet(
-                """
-                QWidget {
-                    background-color: rgba(20, 20, 20, 185);
-                    border: 1px solid rgba(255,255,255,24);
-                    border-radius: 16px;
-                }
-                """
-            )
-
-            self.resize(520, 280)
-            self.move(100, 100)
-            self._old_pos = None
-
-        def mousePressEvent(self, event):
-            if qt_major == 5:
-                self._old_pos = event.globalPos()
-            else:
-                self._old_pos = event.globalPosition().toPoint()
-
-        def mouseMoveEvent(self, event):
-            if self._old_pos is None:
-                return
-
-            if qt_major == 5:
-                current = event.globalPos()
-            else:
-                current = event.globalPosition().toPoint()
-
-            delta = current - self._old_pos
-            self.move(self.x() + delta.x(), self.y() + delta.y())
-            self._old_pos = current
-
-    app = QApplication(sys.argv)
-    widget = KuralWidget(entry)
-    widget.show()
-    app.exec()
-    return True
+	if details:
+		print()
+		print("Details")
+		print("-" * 40)
+		print(f"Book: {details.get('book_tamil', '')}")
+		print(
+			f"Paal: {details.get('paal_name', '')}"
+			f" ({details.get('paal_translation', '')})"
+		)
+		print(
+			f"Iyal: {details.get('iyal_name', '')}"
+			f" ({details.get('iyal_translation', '')})"
+		)
+		print(
+			f"Chapter {details.get('chapter_number', '')}: {details.get('chapter_name', '')}"
+			f" ({details.get('chapter_translation', '')})"
+		)
+		print(
+			f"Chapter Kural Range: {details.get('range_start', '')}-"
+			f"{details.get('range_end', '')}"
+		)
 
 
 def main() -> None:
-    args = parse_args()
-    number = args.number
+	parser = argparse.ArgumentParser(
+		description="Print a Thirukkural verse and metadata by Kural number."
+	)
+	parser.add_argument("number", type=int, help="Kural number (1-1330)")
+	args = parser.parse_args()
 
-    if number < 1 or number > 1330:
-        print("Error: number must be between 1 and 1330.", file=sys.stderr)
-        sys.exit(1)
+	number = args.number
+	if number < 1 or number > 1330:
+		print("Error: kural number must be between 1 and 1330", file=sys.stderr)
+		sys.exit(1)
 
-    json_path = Path(__file__).with_name("thirukkural.json")
-    kurals = load_kurals(json_path)
-    entry = find_kural(kurals, number)
+	base_dir = Path(__file__).resolve().parent
+	kural_data = _load_json(base_dir / "thirukkural.json")
+	detail_data = _load_json(base_dir / "detail.json")
 
-    if entry is None:
-        print(f"Kural {number} not found.", file=sys.stderr)
-        sys.exit(1)
+	kural_items = kural_data.get("kural", [])
+	kural = _find_kural(kural_items, number)
+	if not kural:
+		print(f"Error: kural {number} not found", file=sys.stderr)
+		sys.exit(1)
 
-    if args.text:
-        print_text(entry)
-        return
-
-    if can_use_gui():
-        if render_with_pyqt(entry):
-            return
-
-        print(
-            "PyQt rendering unavailable. Install with: pip install PyQt5 or pip install PyQt6",
-            file=sys.stderr,
-        )
-        print(
-            "For best Tamil display install a Tamil font like 'Noto Sans Tamil'.",
-            file=sys.stderr,
-        )
-
-    print_text(entry)
+	details = _find_kural_details(detail_data, number)
+	_print_kural(number, kural, details)
 
 
 if __name__ == "__main__":
-    main()
+	main()
