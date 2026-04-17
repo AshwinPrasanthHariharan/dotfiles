@@ -69,18 +69,18 @@
         {
             "type": "os",
             "key": " OS",
-            "keyColor": "purple"
+            "keyColor": "magenta"
         },
         {
             "type": "title",
             "key": "│ ├ USER/HOST",
             "format": "{user-name}@{host-name}",
-            "keyColor": "purple"
+            "keyColor": "magenta"
         },
         {
             "type": "kernel",
             "key": "│ ├ KERNEL",
-            "keyColor": "magen"
+            "keyColor": "magenta"
         },
         {
             "type": "packages",
