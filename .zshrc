@@ -22,7 +22,7 @@ export TERMINFO="$HOME/.pixi/envs/default/share/terminfo"
 
 # Enhanced cat command using bat for syntax highlighting
 alias cat="bat"
-
+alias wr="pkill waybar || true; waybar -c $HOME/dotfiles/waybar/config.jsonc -s $HOME/dotfiles/waybar/style.css & disown"
 alias zu="SSH_CONNECTION=\"1 2 3 4\""
 alias zuc="unset SSH_CONNECTION "
 alias zz="source ~/.zshrc"
@@ -97,6 +97,7 @@ pxd() {
 
 # Enable colors and prompt substitution
 autoload -U colors && colors
+autoload -Uz add-zsh-hook
 setopt PROMPT_SUBST
 
 # SSH prompt function - displays user@host when connected via SSH
@@ -154,18 +155,22 @@ python_prompt() {
 }
 
 # Command timer - tracks execution time for commands taking longer than 2 seconds
-preexec() {
+timer_preexec() {
   CMD_START=$SECONDS
 }
 
+
 cmd_timer() {
+  CMD_TIMER_TEXT=""
   (( CMD_START )) || return
   local elapsed=$((SECONDS - CMD_START))
-  (( elapsed > 2 )) && echo "%F{blue}took ${elapsed}s%f"
+  CMD_START=0
+  (( elapsed > 2 )) && CMD_TIMER_TEXT="%F{blue}took ${elapsed}s%f"
 }
 
 # Main prompt builder function
 build_prompt() {
+  local last_status=$?
   local sshpart=""
   local gitpart=""
   local pypart=""
@@ -176,10 +181,11 @@ build_prompt() {
   [[ -n "$ZGIT" ]] && gitpart=" $(git_prompt)"
   [[ -n "$ZPY" ]] && pypart=" $(python_prompt)"
 
-  timer=$(cmd_timer)
+  cmd_timer
+  timer="$CMD_TIMER_TEXT"
 
   local charcolor="%F{green}"
-  [[ $? -ne 0 ]] && charcolor="%F{red}"
+  [[ $last_status -ne 0 ]] && charcolor="%F{red}"
 
   PROMPT=""
 
@@ -190,8 +196,14 @@ build_prompt() {
 }
 
 # Set the custom prompt
-PROMPT='$(build_prompt)'
-precmd() {build_prompt}
+timer_precmd() {build_prompt}
+
+add-zsh-hook -D preexec timer_preexec >/dev/null 2>&1 || true
+add-zsh-hook -D precmd timer_precmd >/dev/null 2>&1 || true
+add-zsh-hook preexec timer_preexec
+add-zsh-hook precmd timer_precmd
+true
+build_prompt
 # ---------- toggles ----------
 zdev() {
   export ZGIT=1
@@ -213,6 +225,12 @@ mkagent() {
 #------------PATHS----------------
 export PATH="$HOME/.pixi/bin:$PATH" 
 #------------keep at end-------------
+# completion/autosuggestion styling
+zstyle ':completion:*' menu select
+zstyle ':completion:*:default' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#888888,italic'
+
 # autosuggestions (can be anywhere before highlighting)
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
@@ -225,10 +243,14 @@ ZSH_HIGHLIGHT_STYLES[alias]='fg=green'
 ZSH_HIGHLIGHT_STYLES[path]='fg=cyan'
 ZSH_HIGHLIGHT_STYLES[globbing]='fg=cyan'
 ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=yellow'
-ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=yellow'
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=yellow,bold'
 ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=red,bold'
 
 # Load extra shell functions.
-[[ -f "$HOME/dotfiles/cmd.sh" ]] && source "$HOME/dotfiles/cmd.sh"
+if [[ -f "$HOME/dotfiles/cmd.sh" ]]; then
+  source "$HOME/dotfiles/cmd.sh"
+fi
 
-[[ -f "$HOME/dotfiles/HS202rc" ]] && source "$HOME/dotfiles/HS202rc"
+if [[ -f "$HOME/dotfiles/HS202rc" ]]; then
+  source "$HOME/dotfiles/HS202rc"
+fi
