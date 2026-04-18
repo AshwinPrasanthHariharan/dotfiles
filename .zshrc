@@ -254,3 +254,5 @@ fi
 if [[ -f "$HOME/dotfiles/HS202rc" ]]; then
   source "$HOME/dotfiles/HS202rc"
 fi
+
+export PATH="/home/ashwin/.pixi/bin:$PATH"
