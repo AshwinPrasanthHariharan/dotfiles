@@ -46,8 +46,6 @@
         }
     },
     "custom/orbit": {
-    "exec": "orbit waybar-status",
-    "return-type": "json",
     "interval": 10,
     "on-click": "orbit toggle top-right",
     "format": ""
@@ -60,9 +58,7 @@
         }
     },
     "clock": {
-        "format": "{:%b,%d %H:%M}",
-        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-        "format-alt": "{:%Y-%m-%d}"
+        "format": "{:%b,%d %Y %H:%M}"
     },
     "cpu": {
         "format": "{usage}% ",
@@ -85,15 +81,15 @@
         "format-icons": ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
     },
     "battery": {
+        "interval": 5,
         "states": {
             "good": 95,
             "warning": 30,
             "critical": 15
         },
         "format": "{capacity}% {icon}",
-        "format-full": "{capacity}% {icon}",
-        "format-charging": "{capacity}% {icon}",
-        "format-plugged": "{capacity}% ",
+        "format-charging": "{capacity}%  {icon}",
+        "format-full": "100% 󰂅",
         "format-alt": "{time} {icon}",
         // "format-good": "", // An empty format will hide the module
         // "format-full": "",

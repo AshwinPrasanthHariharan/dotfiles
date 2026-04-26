@@ -4,6 +4,7 @@
 # INIT
 # ==============================================================================
 eval "$(zoxide init zsh)"
+setopt interactivecomments
 
 # ==============================================================================
 # ENVIRONMENT
@@ -59,7 +60,10 @@ kural() {
 
 pxa() {
   export _OLD_PIXI_PATH="$PATH"
-  eval "$(pixi shell-hook)"
+  eval "$(pixi shell-hook)"echo $XDG_DATA_DIRS
+
+~
+❯ 
 }
 
 pxd() {
@@ -212,7 +216,7 @@ source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zs
 # Autosuggestion configuration
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#444444'  # Dark grey with hex code
+ZSH_AUTOSUGGES66T_HIGHLIGHT_STYLE='fg=#99999'  # Dark grey with hex code
 bindkey '^ ' autosuggest-accept              # Ctrl+Space to accept suggestion
 
 
