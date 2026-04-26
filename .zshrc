@@ -34,6 +34,21 @@ alias clr="clear"
 alias c="clear"
 alias code.="code ."
 
+# Quick git shortcuts via "gir"
+alias g="git"
+alias gst="git status -sb"
+alias ga="git add"
+alias gaa="git add ."
+alias gc="git commit -m"
+alias gca="git commit --amend"
+alias gp="git push"
+alias gpf="git push --force-with-lease"
+alias gpl="git pull --rebase"
+alias gb="git branch"
+alias gco="git checkout"
+alias girsw="git switch"
+alias girl="git log --oneline --graph --decorate -20"
+
 # ==============================================================================
 # FUNCTIONS
 # ==============================================================================
