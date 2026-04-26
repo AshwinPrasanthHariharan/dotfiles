@@ -3,7 +3,12 @@
 // Check the wiki for a full description of the configuration:
 // https://yalter.github.io/niri/Configuration:-Introduction
 spawn-at-startup "swaybg" "-i" "/home/ashwin/Pictures/purple_night.png" "-m" "fill"
+spawn-sh-at-startup "niri msg action spawn-sh -- 'orbit daemon'"
 prefer-no-csd
+environment {
+    XCURSOR_THEME "Adwaita"
+    XCURSOR_SIZE "25"
+}
 // Input device configuration.
 // Find the full list of options on the wiki:
 // https://yalter.github.io/niri/Configuration:-Input
@@ -26,22 +31,19 @@ input {
         numlock
     }
 
-    // Next sections include libinput settings.
     // Omitting settings disables them, or leaves them at their default values.
     // All commented-out settings here are examples, not defaults.
     touchpad {
-        // off
-        tap
-        // dwt
-        // dwtp
-        // drag false
-        // drag-lock
-        natural-scroll
-        // accel-speed 0.2
-        // accel-profile "flat"
-        // scroll-method "two-finger"
-        // disabled-on-external-mouse
-    }
+    tap
+    dwt
+    dwtp
+    drag true
+    natural-scroll
+    accel-speed 0.2
+    accel-profile "adaptive"
+    // Uncomment below if you use a mouse often
+    // disabled-on-external-mouse
+}
 
     mouse {
         // off
@@ -242,8 +244,27 @@ layout {
 // which may be more convenient to use.
 // See the binds section below for more spawn examples.
 
-// Start waybar with this repo's config so changes in dotfiles are applied.
-spawn-at-startup "waybar" "-c" "/home/ashwin/dotfiles/waybar/config.jsonc" "-s" "/home/ashwin/dotfiles/waybar/style.css"
+// Start a PolicyKit auth agent, nm-tray, and waybar.
+spawn-sh-at-startup "if [ -x /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 ]; then /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1; elif [ -x /usr/lib/lxqt-policykit-agent/lxqt-policykit-agent ]; then /usr/lib/lxqt-policykit-agent/lxqt-policykit-agent; elif [ -x /usr/libexec/lxqt-policykit-agent ]; then /usr/libexec/lxqt-policykit-agent; elif [ -x /usr/lib/polkit-kde-authentication-agent-1 ]; then /usr/lib/polkit-kde-authentication-agent-1; elif [ -x /usr/lib/polkit-kde-agent-1 ]; then /usr/lib/polkit-kde-agent-1; elif [ -x /usr/lib/mate-polkit/polkit-mate-authentication-agent-1 ]; then /usr/lib/mate-polkit/polkit-mate-authentication-agent-1; fi"
+spawn-sh-at-startup "wpctl set-volume -l 2.0 @DEFAULT_AUDIO_SINK@ 2.0"
+spawn-at-startup "waybar"
+spawn-at-startup "nwg-look" "-a"
+// spawn-at-startup "swww" "img" "~/Pictures/Background.gif"
+spawn-at-startup "cliphist" "wipe"
+
+// spawn-at-startup "swaybg" "-i" "~/Downloads/b227.jpg"
+
+spawn-at-startup "bash" "-c" "mkfifo -m 600 /tmp/wobpipe 2>/dev/null; tail -f /tmp/wobpipe | wob"
+
+spawn-at-startup "wl-paste" "--watch" "cliphist" "store"
+spawn-at-startup "nm-applet" "--indicator"
+// spawn-at-startup "sherlock" "--daemonize"
+spawn-at-startup "rofi" "-drun-use-desktop-cache" "-show" "drun" "-theme" "~/sources/rofi/themes/DarkBlue.rasi"
+// spawn-at-startup "xwayland-satellite" ":0"
+
+// spawn-at-startup "swayidle" "-w" "timeout" "601" "niri msg action power-off-monitors" "timeout" "600" "swaylock -f" "before-sleep" "swaylock -f"
+
+spawn-at-startup "swayidle" "-w" "timeout" "570" "swaylock -f --grace 30" "timeout" "601" "niri msg action power-off-monitors" "resume" "niri msg action power-on-monitors" "before-sleep" "swaylock -f"
 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
@@ -327,8 +348,8 @@ binds {
     // Example volume keys mappings for PipeWire & WirePlumber.
     // allow-when-locked=true makes these work even when the session is locked.
     // Using spawn-sh allows to pass multiple arguments together with the command.
-    // "-l 1.0" limits the volume to 100%.
-    XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.0"; }
+    // "-l 2.0" limits the volume to 200%.
+    XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 2.0"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-"; }
     XF86AudioMute        allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"; }
     XF86AudioMicMute     allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; }

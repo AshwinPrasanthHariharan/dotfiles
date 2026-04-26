@@ -13,8 +13,8 @@ window#waybar {
 
     /* Now apply your custom style */
     background-color: rgba(43, 48, 59, 0.6); 
-    border-bottom: 3px solid rgba(199, 53, 232, 0.5);
-    color: #f158f4;
+    border-bottom: 3px solid rgb(125, 38, 255);
+    color: #8b56c0;
 }
 
 /*
@@ -26,58 +26,37 @@ window#waybar.solo {
 }
 */
 
-
-
-
-/* you can set a style on hover for any module like this */
-#pulseaudio:hover {
-    background-color: #a37800;
+#battery.charging,
+#battery.plugged {
+    color: #7cff7e;
 }
 
-#clock {
-    background-color: #64727D;
+#battery.warning:not(.charging):not(.plugged) {
+    color: #1A1B26;
+    background-color: #F8FFB8;
 }
 
-#battery {
-    background-color: #ffffff;
-    color: #000000;
+#battery.critical:not(.charging):not(.plugged) {
+    color: #FFFFFF;
+    background-color: #FF5C8A;
 }
 
-#battery.charging, #battery.plugged {
-    color: #ffffff;
-    background-color: #26A65B;
-}
 
 @keyframes blink {
     to {
-        background-color: #ffffff;
-        color: #000000;
+        background-color: #A277FF;
+        color: #1A1B26;
     }
 }
 
 /* Using steps() instead of linear as a timing function to limit cpu usage */
-#battery.critical:not(.charging) {
-    background-color: #f53c3c;
-    color: #ffffff;
+#battery.critical:not(.charging):not(.plugged) {
     animation-name: blink;
     animation-duration: 0.5s;
     animation-timing-function: steps(12);
     animation-iteration-count: infinite;
     animation-direction: alternate;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*Workspaces*/   
 #window,
 #workspaces {
@@ -94,7 +73,7 @@ window#waybar.solo {
 }
 
 #workspaces button.focused, #workspaces button.active {
-    background-color: #8b56c0;
+    background-color: #A277FF;
     box-shadow: inset 0 -2px #ffffff;
 }
 
@@ -111,6 +90,22 @@ window#waybar.solo {
     margin-right: 0;
 }
 
+#custom-power {
+    padding-left: 8px;
+    padding-right: 4px;
+}
+
+.modules-right > widget:last-child > #custom-power {
+    margin-right: 0;
+    padding-right: 2px;
+}
+
+.modules-right > widget {
+    margin: 0 2px;
+}
+
+
+
 
 /**/
 #clock,
@@ -121,6 +116,7 @@ window#waybar.solo {
 #temperature,
 #backlight,
 #network,
+#bluetooth,
 #pulseaudio,
 #wireplumber,
 #custom-media,
@@ -130,10 +126,47 @@ window#waybar.solo {
 #scratchpad,
 #power-profiles-daemon,
 #mpd {
-    padding: 0 10px;
-    color: #d900f6;
+    padding: 0 8px;
+    color: #8b5cf6;
     background: transparent;
     background-color: transparent;
+}
+#custom-orbit {
+    padding: 0 10px;
+    color: #8b5cf6;
+    background: transparent;
+    background-color: transparent;
+}
+
+#idle_inhibitor {
+    padding: 0 1px;
+    min-width: 28px;
+}
+
+#bluetooth {
+    min-width: 28px;
+    padding-left: 8px;
+    padding-right: 8px;
+    
+}
+#power-profiles-daemon {
+    min-width: 20px;
+    padding-left: 0px;
+    padding-right: 8px;
+}
+#battery {
+    min-width: 20px;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+#custom-power {
+    min-width: 20px;
+    padding-left: 8px;
+    padding-right: 20px;
+}
+/* Force readable gaps between right-side status modules */
+.modules-right > widget {
+    margin: 0 2px;
 }
 
 /* EndeavourOS transparent + purple icon theme override */
@@ -193,7 +226,15 @@ window#waybar.solo {
 #language,
 #keyboard-state,
 #privacy-item,
-#workspaces button {
+#workspaces button 
+
+    // Actions to switch layouts.
+    // Note: if you uncomment these, make sure you do NOT have
+    // a matching layout switch hotkey configured in xkb options above.
+    // Having both at once on the same hotkey will break the switching,
+    // since it will switch twice upon pressing the hotkey (once by xkb, once by niri).
+    // Mod+Space       { switch-layout "next"; }
+    // Mod+Shift+Space { switch-layout "prev"; }{
     color: #d900f6;
 }
 */
