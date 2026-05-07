@@ -330,10 +330,10 @@ function ff {
   case "$1" in
     -l|--long)
       shift
-      fastfetch --config "$HOME/dotfiles/fastfetch/config-long.jsonc" "$@"
+      fastfetch --config "$HOME/dotfiles/fastfetch/config-long.jsonc"  --kitty-direct "$HOME/dotfiles/orbit.png" "$@"
       ;;
     *)
-      fastfetch --config "$HOME/dotfiles/fastfetch/config-short.jsonc" "$@"
+      fastfetch --config "$HOME/dotfiles/fastfetch/config-short.jsonc" --kitty-direct "$HOME/dotfiles/orbit.png" "$@"
       ;;
   esac
 }

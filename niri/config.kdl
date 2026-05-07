@@ -258,9 +258,8 @@ spawn-at-startup "cliphist" "wipe"
 spawn-at-startup "bash" "-c" "mkfifo -m 600 /tmp/wobpipe 2>/dev/null; tail -f /tmp/wobpipe | wob"
 
 spawn-at-startup "wl-paste" "--watch" "cliphist" "store"
-spawn-at-startup "nm-applet" "--indicator"
+spawn-at-startup "/home/ashwin/dotfiles/niri/resize_floater.sh"
 // spawn-at-startup "sherlock" "--daemonize"
-spawn-at-startup "rofi" "-drun-use-desktop-cache" "-show" "drun" "-show-icons" "-theme" "/home/ashwin/dotfiles/squared-everforest.rasi"
 // spawn-at-startup "xwayland-satellite" ":0"
 
 // spawn-at-startup "swayidle" "-w" "timeout" "601" "niri msg action power-off-monitors" "timeout" "600" "swaylock -f" "before-sleep" "swaylock -f"
@@ -299,18 +298,26 @@ window-rule {
     // - host Firefox (app-id is "firefox")
     // - Flatpak Firefox (app-id is "org.mozilla.firefox")
     match app-id="firefox$" title="^Picture-in-Picture$"
-    open-floating true
+    open-floating false
 }
 window-rule {
     // Matches any window that is in a floating state
     match is-floating=true
 
     // This sets the launch size for those floating windows
-    default-column-width { fixed 800; }
-    default-window-height { fixed 600; }
+    default-column-width { proportion 0.5; }
+    default-window-height { proportion 0.5; }
     
 }
-
+window-rule {
+    // Matches any window that is in a floating state
+    match is-floating=true
+    match app-id="^thunar$"
+    // This sets the launch size for those floating windows
+    default-column-width { proportion 0.5; }
+    default-window-height { proportion 0.5; }
+    
+}
 // Example: block out two password managers from screen capture.
 // (This example rule is commented out with a "/-" in front.)
 /-window-rule {
