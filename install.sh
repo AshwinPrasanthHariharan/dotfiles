@@ -150,6 +150,52 @@ symlink_zshrc() {
     log_info "Symlinked .zshrc from $dotfiles_dir/.zshrc"
 }
 
+# Function to force a symlink, replacing any existing file or symlink
+force_symlink() {
+    local source_path=$1
+    local target_path=$2
+
+    mkdir -p "$(dirname "$target_path")"
+    ln -sfn "$source_path" "$target_path"
+}
+
+# Function to install waybar based on package manager
+install_waybar() {
+    local pm=$1
+
+    log_info "Installing waybar using $pm..."
+
+    case $pm in
+        apt)
+            sudo apt install -y waybar
+            ;;
+
+        dnf)
+            sudo dnf install -y waybar
+            ;;
+
+        pacman)
+            sudo pacman -S --noconfirm waybar
+            ;;
+
+        xbps)
+            sudo xbps-install -y waybar
+            ;;
+
+        brew)
+            log_warn "waybar is not generally available via Homebrew on Linux. Please install it manually if needed."
+            return 0
+            ;;
+
+        *)
+            log_warn "Unsupported package manager for waybar. Please install it manually."
+            return 0
+            ;;
+    esac
+
+    log_info "waybar is installed"
+}
+
 # Function to change shell to zsh
 change_shell() {
     local zsh_path
@@ -172,29 +218,37 @@ install_niri() {
 
     case $pm in
         apt)
-            # Add niri PPA or install from repos if available
             if ! command -v niri >/dev/null 2>&1; then
-                log_warn "niri not available in default repos. Please install manually from https://github.com/YaLTeR/niri"
-                return 0
+                if ! sudo apt install -y niri; then
+                    log_warn "niri not available in apt repositories. Please install manually from https://github.com/YaLTeR/niri"
+                    return 0
+                fi
             fi
             ;;
 
         dnf)
             if ! command -v niri >/dev/null 2>&1; then
-                log_warn "niri not available in default repos. Please install manually from https://github.com/YaLTeR/niri"
-                return 0
+                if ! sudo dnf install -y niri; then
+                    log_warn "niri not available in dnf repositories. Please install manually from https://github.com/YaLTeR/niri"
+                    return 0
+                fi
             fi
             ;;
 
         pacman)
-            # Check if niri is already available
             if ! command -v niri >/dev/null 2>&1; then
-                log_info "Installing niri from AUR using yay..."
                 if command -v yay >/dev/null 2>&1; then
+                    log_info "Installing niri from AUR using yay..."
                     yay -S niri --noconfirm
+                fi
+                if command -v paru >/dev/null 2>&1; then
+                    log_info "Installing niri from AUR using paru..."
+                    paru -S niri --noconfirm
                 else
-                    log_warn "yay not found. Please install niri manually from AUR"
-                    return 0
+                    if ! sudo pacman -S --noconfirm niri; then
+                        log_warn "niri not available in pacman repositories and yay was not found. Please install manually from AUR or https://github.com/YaLTeR/niri"
+                        return 0
+                    fi
                 fi
             fi
             ;;
@@ -202,20 +256,126 @@ install_niri() {
         xbps)
             # Void Linux package
             if ! command -v niri >/dev/null 2>&1; then
-                sudo xbps-install -y niri
+                if ! sudo xbps-install -y niri; then
+                    log_warn "niri not available in xbps repositories. Please install manually from https://github.com/YaLTeR/niri"
+                    return 0
+                fi
+            
             fi
             ;;
 
         brew)
             # macOS
             if ! command -v niri >/dev/null 2>&1; then
-                log_warn "niri not available via Homebrew. Please install manually from https://github.com/YaLTeR/niri"
+                log_warn "niri is linux wm and not available on macOS."
                 return 0
             fi
             ;;
     esac
 
     log_info "niri is installed"
+}
+install-waybar() {
+    local pm=$1
+
+    log_info "Installing waybar using $pm..."
+
+    case $pm in
+        apt)
+            sudo apt install -y waybar
+            ;;
+
+        dnf)
+            sudo dnf install -y waybar
+            ;;
+
+        pacman)
+            sudo pacman -S --noconfirm waybar
+            ;;
+
+        xbps)
+            sudo xbps-install -y waybar
+            ;;
+
+        brew)
+            log_warn "waybar is not generally available via Homebrew on Linux. Please install it manually if needed."
+            return 0
+            ;;
+
+        *)
+            log_warn "Unsupported package manager for waybar. Please install it manually."
+            return 0
+            ;;
+    esac
+
+    log_info "waybar is installed"
+}
+
+# Function to install rofi based on package manager
+install_rofi() {
+    local pm=$1
+
+    log_info "Installing rofi using $pm..."
+
+    case $pm in
+        apt)
+            sudo apt install -y rofi
+            ;;
+
+        dnf)
+            sudo dnf install -y rofi
+            ;;
+
+        pacman)
+            sudo pacman -S --noconfirm rofi
+            ;;
+
+        xbps)
+            sudo xbps-install -y rofi
+            ;;
+
+        brew)
+            brew install rofi
+            ;;
+
+        *)
+            log_warn "Unsupported package manager for rofi. Please install it manually."
+            return 0
+            ;;
+    esac
+
+    log_info "rofi is installed"
+}
+
+# Function to configure rofi
+configure_rofi() {
+    local dotfiles_dir
+    local rofi_config_dir
+    dotfiles_dir=$(pwd)
+    rofi_config_dir="$HOME/.config/rofi"
+
+    mkdir -p "$rofi_config_dir"
+
+    force_symlink "$dotfiles_dir/rofi/config.rasi" "$rofi_config_dir/config.rasi"
+    force_symlink "$dotfiles_dir/rofi/squared-everforest.rasi" "$rofi_config_dir/squared-everforest.rasi"
+
+    log_info "Symlinked rofi config files into $rofi_config_dir"
+}
+
+# Function to configure waybar
+configure_waybar() {
+    local dotfiles_dir
+    local waybar_config_dir
+    dotfiles_dir=$(pwd)
+    waybar_config_dir="$HOME/.config/waybar"
+
+    mkdir -p "$waybar_config_dir"
+
+    force_symlink "$dotfiles_dir/waybar/config.jsonc" "$waybar_config_dir/config.jsonc"
+    force_symlink "$dotfiles_dir/waybar/style.css" "$waybar_config_dir/style.css"
+    force_symlink "$dotfiles_dir/waybar/power_menu.xml" "$waybar_config_dir/power_menu.xml"
+
+    log_info "Symlinked waybar config files into $waybar_config_dir"
 }
 
 # Function to configure niri
@@ -285,27 +445,30 @@ main() {
     # Change shell
     change_shell
 
-    # Ask user if they want to install niri
-    read -p "Do you want to install and configure niri (Wayland compositor)? (y/n) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        if command -v niri >/dev/null 2>&1; then
-            configure_niri
-            setup_niri_startup
-        else
-            install_niri "$pm"
-            if command -v niri >/dev/null 2>&1; then
-                configure_niri
-                setup_niri_startup
-            else
-                log_error "niri installation failed. Please install manually from https://github.com/YaLTeR/niri"
-            fi
-        fi
+    # Install and configure waybar and niri
+    install_waybar "$pm"
+    configure_waybar
+
+    install_rofi "$pm"
+    configure_rofi
+
+    install_niri "$pm"
+    if command -v niri >/dev/null 2>&1; then
+        configure_niri
+        setup_niri_startup
+    else
+        log_warn "niri is not available yet. Please install it manually if you want the compositor setup."
     fi
 
     log_info "Installation complete!"
     log_info "Run 'source ~/.zshrc' or restart your terminal to apply changes."
     log_info "You may need to install a Nerd Font for proper icon display in the terminal."
+    if command -v waybar >/dev/null 2>&1; then
+        log_info "To start waybar, use your compositor or run: waybar"
+    fi
+    if command -v rofi >/dev/null 2>&1; then
+        log_info "To launch rofi, use: rofi -show drun"
+    fi
     if command -v niri >/dev/null 2>&1; then
         log_info "To start niri, run: niri"
     fi
