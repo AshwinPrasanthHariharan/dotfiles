@@ -415,6 +415,56 @@ setup_niri_startup() {
     fi
 }
 
+# Function to install kitty based on package manager
+install_kitty() {
+    local pm=$1
+
+    log_info "Installing kitty using $pm..."
+
+    case $pm in
+        apt)
+            sudo apt install -y kitty
+            ;;
+        dnf)
+            sudo dnf install -y kitty
+            ;;
+        pacman)
+            sudo pacman -S --noconfirm kitty
+            ;;
+        xbps)
+            sudo xbps-install -y kitty
+            ;;
+        brew)
+            brew install kitty
+            ;;
+        *)
+            log_warn "Unsupported package manager for kitty. Please install it manually."
+            return 0
+            ;;
+    esac
+
+    log_info "kitty is installed"
+}
+
+# Function to configure kitty
+configure_kitty() {
+    local dotfiles_dir
+    local kitty_config_dir
+    dotfiles_dir=$(pwd)
+    kitty_config_dir="$HOME/.config/kitty"
+
+    mkdir -p "$kitty_config_dir"
+
+    if [ -f "$kitty_config_dir/kitty.conf" ]; then
+        local backup_file="$kitty_config_dir/kitty.conf.backup.$(date +%Y%m%d_%H%M%S)"
+        mv "$kitty_config_dir/kitty.conf" "$backup_file"
+        log_info "Backed up existing kitty config to $backup_file"
+    fi
+
+    ln -sf "$dotfiles_dir/kitty/kitty.conf" "$kitty_config_dir/kitty.conf"
+    log_info "Symlinked kitty config into $kitty_config_dir"
+}
+
 # Main installation function
 main() {
     log_info "Starting dotfiles installation..."
@@ -451,6 +501,10 @@ main() {
 
     install_rofi "$pm"
     configure_rofi
+
+    # Install and configure kitty
+    install_kitty "$pm"
+    configure_kitty
 
     install_niri "$pm"
     if command -v niri >/dev/null 2>&1; then
