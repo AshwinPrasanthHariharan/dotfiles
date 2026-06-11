@@ -10,7 +10,9 @@
     "modules-left": [
         "niri/workspaces"
     ],
-    "modules-center": ["clock"],
+    "modules-center": [
+        "clock"
+    ],
     "modules-right": [
         "mpd",
         "idle_inhibitor",
@@ -22,8 +24,6 @@
         "memory",
         "temperature",
         "backlight",
-        "keyboard-state",
-        "sway/language",
         "battery",
         "power-profiles-daemon",
         "tray",
@@ -46,11 +46,11 @@
         }
     },
     "custom/orbit": {
-    "interval": 10,
-    "on-click": "orbit toggle top-right",
-    "format": "",
-    "tooltip": false
-},
+        "interval": 10,
+        "on-click": "orbit toggle top-right",
+        "format": "",
+        "tooltip": false
+    },
     "idle_inhibitor": {
         "format": "{icon}",
         "format-icons": {
@@ -75,12 +75,32 @@
         "critical-threshold": 80,
         // "format-critical": "{temperatureC}°C {icon}",
         "format": "{temperatureC}°C {icon}",
-        "format-icons": ["", "", ""]
+        "format-icons": [
+            "",
+            "",
+            ""
+        ]
     },
     "backlight": {
         // "device": "acpi_video1",
         "format": "{percent}% {icon}",
-        "format-icons": ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+        "format-icons": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
         "tooltip": false
     },
     "battery": {
@@ -97,21 +117,44 @@
         // "format-good": "", // An empty format will hide the module
         // "format-full": "",
         "format-icons": {
-            "default":  ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
-            "charging": ["󰢟", "󰢜", "󰂆", "󰂇", "󰂈", "󰢝", "󰂉", "󰢞", "󰂊", "󰂋", "󰂅"]
+            "default": [
+                "󰂎",
+                "󰁺",
+                "󰁻",
+                "󰁼",
+                "󰁽",
+                "󰁾",
+                "󰁿",
+                "󰂀",
+                "󰂁",
+                "󰂂",
+                "󰁹"
+            ],
+            "charging": [
+                "󰢟",
+                "󰢜",
+                "󰂆",
+                "󰂇",
+                "󰂈",
+                "󰢝",
+                "󰂉",
+                "󰢞",
+                "󰂊",
+                "󰂋",
+                "󰂅"
+            ]
         },
         "tooltip": false
-
     },
     "power-profiles-daemon": {
-      "format": "{icon}",
-      "tooltip-format": "Power profile: {profile}\nDriver: {driver}",
-      "tooltip": true,
-      "format-icons": {
-        "performance": "",
-        "balanced": "",
-        "power-saver": ""
-      }
+        "format": "{icon}",
+        "tooltip-format": "Power profile: {profile}\nDriver: {driver}",
+        "tooltip": true,
+        "format-icons": {
+            "performance": "",
+            "balanced": "",
+            "power-saver": ""
+        }
     },
     "network": {
         // "interface": "wlp2*", // (Optional) To force the use of this interface
@@ -121,7 +164,13 @@
         "format-disconnected": "󰤮",
         "format-alt": "{ifname}: {ipaddr}/{cidr}",
         "format-icons": {
-            "wifi": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
+            "wifi": [
+                "󰤯",
+                "󰤟",
+                "󰤢",
+                "󰤥",
+                "󰤨"
+            ],
             "ethernet": "󰈀",
             "disconnected": "󰤮"
         },
@@ -134,7 +183,11 @@
     "wireplumber#sink": {
         "format": "{icon} {volume}%",
         "format-muted": "",
-        "format-icons": ["","",""],
+        "format-icons": [
+            "",
+            "",
+            ""
+        ],
         "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
         "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 3%- -l 2.0",
         "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 3%+ -l 2.0"
@@ -164,9 +217,9 @@
         // "exec": "$HOME/.config/waybar/mediaplayer.py --player spotify 2> /dev/null" // Filter player based on name
     },
     "custom/power": {
-        "format" : "⏻",
-		"tooltip": false,
-		"menu": "on-click",
+        "format": "⏻",
+        "tooltip": false,
+        "menu": "on-click",
         "menu-file": "/home/ashwin/dotfiles/waybar/power_menu.xml", // Menu file in dotfiles
         "menu-actions": {
             "shutdown": "systemctl poweroff",

@@ -47,7 +47,7 @@ alias gpf="git push --force-with-lease"
 alias gpl="git pull --rebase"
 alias gb="git branch"
 alias gco="git checkout"
-alias girsw="git switch"
+alias gisw="git switch"
 alias girl="git log --oneline --graph --decorate -20"
 
 # ==============================================================================
@@ -258,3 +258,5 @@ if [[ -f "$HOME/dotfiles/HS202rc" ]]; then
 fi
 
 export PATH="/home/ashwin/.pixi/bin:$PATH"
+
+. "$HOME/.local/bin/env"

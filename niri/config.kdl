@@ -2,7 +2,7 @@
 // "/-" comments out the following node.
 // Check the wiki for a full description of the configuration:
 // https://yalter.github.io/niri/Configuration:-Introduction
-spawn-at-startup "swaybg" "-i" "/home/ashwin/dotfiles/assets/wallpaper/purple_night.png" "-m" "fill"
+spawn-at-startup "swaybg" "-i" "/home/ashwin/dotfiles/assets/wallpaper/sol_wall.png" "-m" "fill"
 spawn-at-startup "orbit" "daemon"
 spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP"
 prefer-no-csd

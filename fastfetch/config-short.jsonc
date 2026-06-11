@@ -4,16 +4,16 @@
     "separator": ":",
     "color": "#E6E1F5"
   },
-"logo": {
-  "padding": {
-    "right": 2
-  }
-},
+  "logo": {
+    "padding": {
+      "right": 2
+    }
+  },
   "modules": [
     "title",
     {
       "type": "os",
-      "key": " OS    ",
+      "key": " OS    ",
       "keyColor": "#A277FF"
     },
     {
