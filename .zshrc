@@ -107,6 +107,44 @@ mkagent() {
   ssh-add ~/.ssh/id_ed25519
 }
 
+git-to-ssh() {
+    local current_url
+    current_url=$(git remote get-url origin 2>/dev/null)
+
+    if [ -z "$current_url" ]; then
+        echo "Error: Not a git repository or no 'origin' remote found."
+        return 1
+    fi
+
+    # Check if it's already an SSH URL
+    if [[ "$current_url" == git@* ]]; then
+        echo "Remote 'origin' is already using SSH: $current_url"
+        return 0
+    fi
+
+    # Universal string manipulation (Works in Zsh and Bash)
+    if [[ "$current_url" == https://* ]]; then
+        # Strip the 'https://' prefix
+        local temp="${current_url#https://}"
+        
+        # Grab everything before the first slash (github.com)
+        local domain="${temp%%/*}"
+        
+        # Grab everything after the first slash (User/Repo.git)
+        local path="${temp#*/}"
+        
+        local new_url="git@${domain}:${path}"
+
+        # Apply the new URL
+        git remote set-url origin "$new_url"
+        echo "Successfully swapped origin to SSH!"
+        echo "Old: $current_url"
+        echo "New: $new_url"
+    else
+        echo "Error: Could not parse HTTPS URL format ($current_url)."
+        return 1
+    fi
+}
 # ==============================================================================
 # PROMPT
 # ==============================================================================
